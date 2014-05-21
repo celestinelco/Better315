@@ -157,19 +157,16 @@ void execute() {
       misc_ops = decode(misc);
       switch(misc_ops) {
         case MISC_PUSH:
-          addr = dmem.size();
-          cout << "SP: " << hex << addr << endl;
+          addr = SP + dmem.getBase();
           for(BitCount = 0; BitCount < 8; BitCount ++) {
             // If we push this register
             if((1 << BitCount) & misc.instr.push.reg_list) {
               dmem.write(addr, rf[BitCount]);
-              printf("Putting %d in %08x\n", (int) rf[BitCount], addr);
               addr += 4;
             }
           }
           if(misc.instr.push.m) {
-            dmem.write(addr - diff, LR);
-              printf("Putting %08X in %08X\n", (int) LR, addr);
+            dmem.write(addr, LR);
             addr += 4;
           }
           rf.write(SP_REG, addr - dmem.getBase());

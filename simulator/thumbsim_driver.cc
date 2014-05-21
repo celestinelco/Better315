@@ -6,12 +6,9 @@ void Memory<Data8, Data32>::write(const unsigned int addr, const Data32 data) {
   //   if little-endian, 3210 (MSB=3)
   // memory is in big-endian format (0123, MSB=0)
   int i;
-  cout << hex << addr << endl;
   unsigned int myAddr = addr - base;
   if (size() < myAddr + 4) {
-    cout << "size: " << hex << size() << " < " << myAddr + 4 << endl;
     m.resize(myAddr + 4, 0);
-    cout << "new size: " << hex << size() << endl;
   }
   if (myAddr < lowest) lowest = myAddr;
   if (myAddr > highest) highest = myAddr;
