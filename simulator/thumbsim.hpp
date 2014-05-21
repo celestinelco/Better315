@@ -8,9 +8,10 @@
 #include <cmath>
 
 
-// NO MORE WARNING BREH
+// NO MORE WARNINGS BREH
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-type"
+#pragma GCC diagnostic ignored "-Wswitch"
 
 
 using namespace std;
