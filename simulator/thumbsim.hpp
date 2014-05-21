@@ -7,6 +7,12 @@
 #include <map>
 #include <cmath>
 
+
+// NO MORE WARNING BREH
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
+
+
 using namespace std;
 
 /* Bool Defines */

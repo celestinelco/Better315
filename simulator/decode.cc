@@ -345,3 +345,4 @@ int decode (const ADD_SP_Type data) {
       cout << "add r" << data.instr.add.rd << ", sp, #" << data.instr.add.imm << endl;
    }
 }
+
