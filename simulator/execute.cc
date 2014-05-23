@@ -20,6 +20,7 @@ ASPR flags;
 // and you'll need to fill in the rest of these.
 // See Page 99 of the armv6 manual
 static int checkCondition(unsigned short cond) {
+  cout << "TODO: " << dec << __LINE__ << endl;
   switch(cond) {
     case EQ:
       if (flags.Z == 1) {
@@ -93,15 +94,19 @@ void execute() {
       add_ops = decode(alu);
       switch(add_ops) {
         case ALU_LSLI:
+          cout << "TODO: " << dec << __LINE__ << endl;
           break;
         case ALU_LSRI:
+          cout << "TODO: " << dec << __LINE__ << endl;
           break;
         case ALU_ASRI:
+          cout << "TODO: " << dec << __LINE__ << endl;
           break;
         case ALU_ADDR:
           rf.write(alu.instr.addr.rd, rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
           break;
         case ALU_SUBR:
+          cout << "TODO: " << dec << __LINE__ << endl;
           break;
         case ALU_ADD3I:
           rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
@@ -113,6 +118,7 @@ void execute() {
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
           break;
         case ALU_CMP:
+          cout << "TODO: " << dec << __LINE__ << endl;
           break;
         case ALU_ADD8I:
           rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
@@ -126,6 +132,8 @@ void execute() {
       break;
     case DP:
       decode(dp);
+      cout << "TODO: " << dec << __LINE__ << endl;
+      break;
       break;
     case SPECIAL:
       sp_ops = decode(sp);
@@ -203,18 +211,23 @@ void execute() {
       if (checkCondition(cond.instr.b.cond)){
         rf.write(PC_REG, PC + 2 * signExtend8to32ui(cond.instr.b.imm) + 2);
       }
+      cout << "TODO: " << dec << __LINE__ << endl;
       break;
     case UNCOND:
       decode(uncond);
+      rf.write(PC_REG, PC + 2 * signExtend8to32ui(uncond.instr.b.imm) + 2);
       break;
     case LDM:
       decode(ldm);
+      cout << "TODO: " << dec << __LINE__ << endl;
       break;
     case STM:
       decode(stm);
+      cout << "TODO: " << dec << __LINE__ << endl;
       break;
     case LDRL:
       decode(ldrl);
+      cout << "TODO: " << dec << __LINE__ << endl;
       break;
     case ADD_SP:
       decode(addsp);

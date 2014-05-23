@@ -21,3 +21,6 @@
 *.app
 
 *.swp
+
+simulator/thumbsim.dSYM/
+thumbsim

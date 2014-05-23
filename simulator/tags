@@ -1,0 +1,68 @@
+ADD_SP_Instr	thumbsim.hpp	/^struct ADD_SP_Instr {$/
+ADD_SP_Type	thumbsim.hpp	/^struct ADD_SP_Type {$/
+ALU_ADD3I_Instr	thumbsim.hpp	/^struct ALU_ADD3I_Instr {$/
+ALU_ADD8I_Instr	thumbsim.hpp	/^struct ALU_ADD8I_Instr {$/
+ALU_ADDR_Instr	thumbsim.hpp	/^struct ALU_ADDR_Instr {$/
+ALU_ASRI_Instr	thumbsim.hpp	/^typedef ALU_LSLI_Instr ALU_ASRI_Instr;$/
+ALU_CMP8I_Instr	thumbsim.hpp	/^typedef ALU_ADD8I_Instr ALU_CMP8I_Instr;$/
+ALU_LSLI_Instr	thumbsim.hpp	/^struct ALU_LSLI_Instr {$/
+ALU_LSRI_Instr	thumbsim.hpp	/^typedef ALU_LSLI_Instr ALU_LSRI_Instr;$/
+ALU_MOV8I_Instr	thumbsim.hpp	/^typedef ALU_ADD8I_Instr ALU_MOV8I_Instr;$/
+ALU_Ops	thumbsim.hpp	/^} ALU_Ops;$/
+ALU_SUB3I_Instr	thumbsim.hpp	/^typedef ALU_ADD3I_Instr ALU_SUB3I_Instr;$/
+ALU_SUB8I_Instr	thumbsim.hpp	/^typedef ALU_ADD8I_Instr ALU_SUB8I_Instr;$/
+ALU_SUBR_Instr	thumbsim.hpp	/^typedef ALU_ADDR_Instr ALU_SUBR_Instr;$/
+ALU_Type	thumbsim.hpp	/^struct ALU_Type {$/
+ASPR	thumbsim.hpp	/^} ASPR;$/
+COND_B_Instr	thumbsim.hpp	/^struct COND_B_Instr {$/
+COND_Type	thumbsim.hpp	/^struct COND_Type {$/
+DP_Ops	thumbsim.hpp	/^} DP_Ops;$/
+DP_Type	thumbsim.hpp	/^struct DP_Type {$/
+DataType	thumbsim.hpp	/^enum DataType { INSTRUCTIONS, DATA };$/
+LDM_Instr	thumbsim.hpp	/^struct LDM_Instr {$/
+LDM_Type	thumbsim.hpp	/^struct LDM_Type {$/
+LDRL_Instr	thumbsim.hpp	/^struct LDRL_Instr {$/
+LDRL_Type	thumbsim.hpp	/^struct LDRL_Type {$/
+LD_ST_Ops	thumbsim.hpp	/^} LD_ST_Ops;$/
+LD_ST_Type	thumbsim.hpp	/^struct LD_ST_Type {$/
+MISC_ADD_Instr	thumbsim.hpp	/^struct MISC_ADD_Instr {$/
+MISC_BKPT_Instr	thumbsim.hpp	/^struct MISC_BKPT_Instr {$/
+MISC_Ops	thumbsim.hpp	/^} MISC_Ops;$/
+MISC_POP_Instr	thumbsim.hpp	/^typedef MISC_PUSH_Instr MISC_POP_Instr;$/
+MISC_PUSH_Instr	thumbsim.hpp	/^struct MISC_PUSH_Instr {$/
+MISC_REV16_Instr	thumbsim.hpp	/^typedef MISC_SXTH_Instr MISC_REV16_Instr;$/
+MISC_REVSH_Instr	thumbsim.hpp	/^typedef MISC_SXTH_Instr MISC_REVSH_Instr;$/
+MISC_REV_Instr	thumbsim.hpp	/^typedef MISC_SXTH_Instr MISC_REV_Instr;$/
+MISC_SUB_Instr	thumbsim.hpp	/^typedef MISC_ADD_Instr MISC_SUB_Instr;$/
+MISC_SXTB_Instr	thumbsim.hpp	/^typedef MISC_SXTH_Instr MISC_SXTB_Instr;$/
+MISC_SXTH_Instr	thumbsim.hpp	/^struct MISC_SXTH_Instr {$/
+MISC_Type	thumbsim.hpp	/^struct MISC_Type {$/
+MISC_UXTB_Instr	thumbsim.hpp	/^typedef MISC_SXTH_Instr MISC_UXTB_Instr;$/
+MISC_UXTH_Instr	thumbsim.hpp	/^typedef MISC_SXTH_Instr MISC_UXTH_Instr;$/
+MemType	thumbsim.hpp	/^enum MemType { MEM_MEM, MEM_RF, MEM_INVALID };$/
+Mmain.cc	main.cc	/^int main(int argc, char ** argv) {$/
+SP_ADD_Instr	thumbsim.hpp	/^struct SP_ADD_Instr {$/
+SP_BLX_Instr	thumbsim.hpp	/^typedef SP_BX_Instr SP_BLX_Instr;$/
+SP_BX_Instr	thumbsim.hpp	/^struct SP_BX_Instr {$/
+SP_CMP_Instr	thumbsim.hpp	/^typedef SP_ADD_Instr SP_CMP_Instr;$/
+SP_MOV_Instr	thumbsim.hpp	/^typedef SP_ADD_Instr SP_MOV_Instr;$/
+SP_Ops	thumbsim.hpp	/^} SP_Ops;$/
+SP_Type	thumbsim.hpp	/^struct SP_Type {$/
+STM_Instr	thumbsim.hpp	/^struct STM_Instr {$/
+STM_Type	thumbsim.hpp	/^struct STM_Type {$/
+Thumb_Types	thumbsim.hpp	/^} Thumb_Types;$/
+UNCOND_B_Instr	thumbsim.hpp	/^struct UNCOND_B_Instr {$/
+UNCOND_Type	thumbsim.hpp	/^struct UNCOND_Type {$/
+access	thumbsim_driver.cc	/^bool Cache::access(unsigned int address) {$/
+checkCondition	execute.cc	/^static int checkCondition(unsigned short cond) {$/
+decode	decode.cc	/^Thumb_Types decode (const ALL_Types data) {$/
+dump	thumbsim_driver.cc	/^void Memory<Data8, Data32>::dump(DataType dt) cons/
+execute	execute.cc	/^void execute() {$/
+parse	parse.cc	/^void parse(const char * file) {$/
+parseMem	parse.cc	/^void parseMem(ifstream & in, string type) {$/
+print	thumbsim_driver.cc	/^void Stats::print() {$/
+printCond	thumbsim.hpp	/^static void printCond(char byte) {$/
+signExtend16to32ui	execute.cc	/^unsigned int signExtend16to32ui(short i) {$/
+signExtend8to32ui	execute.cc	/^unsigned int signExtend8to32ui(char i) {$/
+swizzle	thumbsim_driver.cc	/^unsigned int swizzle(unsigned int d) {$/
+write	thumbsim_driver.cc	/^void Memory<Data8, Data32>::write(const unsigned i/
