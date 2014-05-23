@@ -134,20 +134,25 @@ void execute() {
       add_ops = decode(alu);
       switch(add_ops) {
         case ALU_LSLI:
+          cout << "TODO: " << dec << __LINE__ << endl;
           break;
         case ALU_LSRI:
+          cout << "TODO: " << dec << __LINE__ << endl;
           break;
         case ALU_ASRI:
+          cout << "TODO: " << dec << __LINE__ << endl;
           break;
         case ALU_ADDR:
           rf.write(alu.instr.addr.rd, rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
           break;
         case ALU_SUBR:
+          cout << "TODO: " << dec << __LINE__ << endl;
           break;
         case ALU_ADD3I:
           rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
           break;
         case ALU_SUB3I:
+          rf.write(alu.instr.sub3i.rd, rf[alu.instr.sub3i.rn] - alu.instr.sub3i.imm);
           break;
         case ALU_MOV:
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
@@ -163,11 +168,13 @@ void execute() {
           flags.N = result < 0;
           flags.C = uSum >> 31;
           flags.V = result != sSum;
+
           break;
         case ALU_ADD8I:
           rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
           break;
         case ALU_SUB8I:
+          rf.write(alu.instr.sub8i.rdn, rf[alu.instr.sub8i.rdn] - alu.instr.sub8i.imm);
           break;
         default:
           break;
@@ -175,6 +182,8 @@ void execute() {
       break;
     case DP:
       decode(dp);
+      cout << "TODO: " << dec << __LINE__ << endl;
+      break;
       break;
     case SPECIAL:
       sp_ops = decode(sp);
@@ -208,8 +217,34 @@ void execute() {
       misc_ops = decode(misc);
       switch(misc_ops) {
         case MISC_PUSH:
+          addr = SP;
+          for(BitCount = 0; BitCount < 8; BitCount ++) {
+            // If we push this register
+            if((1 << BitCount) & misc.instr.push.reg_list) {
+              dmem.write(addr, rf[BitCount]);
+              addr -= 4;
+            }
+          }
+          if(misc.instr.push.m) {
+            dmem.write(addr, LR);
+            addr -= 4;
+          }
+          rf.write(SP_REG, addr);
           break;
         case MISC_POP:
+          addr = SP;
+          for(BitCount = 0; BitCount < 8; BitCount ++) {
+            // If we push this register
+            if(1 << BitCount & misc.instr.push.reg_list) {
+              addr += 4;
+              rf.write(BitCount, dmem[addr]);
+            }
+          }
+          if(misc.instr.push.m) {
+            addr += 4;
+            rf.write(PC_REG, dmem[addr]);
+          }
+          rf.write(SP_REG, addr);
           break;
         case MISC_SUB:
           rf.write(SP_REG, SP - (misc.instr.sub.imm*4));
@@ -229,15 +264,19 @@ void execute() {
       break;
     case UNCOND:
       decode(uncond);
+      rf.write(PC_REG, PC + 2 * signExtend8to32ui(uncond.instr.b.imm) + 2);
       break;
     case LDM:
       decode(ldm);
+      cout << "TODO: " << dec << __LINE__ << endl;
       break;
     case STM:
       decode(stm);
+      cout << "TODO: " << dec << __LINE__ << endl;
       break;
     case LDRL:
       decode(ldrl);
+      cout << "TODO: " << dec << __LINE__ << endl;
       break;
     case ADD_SP:
       decode(addsp);
