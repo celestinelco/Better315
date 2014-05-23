@@ -107,6 +107,7 @@ void execute() {
           rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
           break;
         case ALU_SUB3I:
+          rf.write(alu.instr.sub3i.rd, rf[alu.instr.sub3i.rn] - alu.instr.sub3i.imm);
           break;
         case ALU_MOV:
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
@@ -117,6 +118,7 @@ void execute() {
           rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
           break;
         case ALU_SUB8I:
+          rf.write(alu.instr.sub8i.rdn, rf[alu.instr.sub8i.rdn] - alu.instr.sub8i.imm);
           break;
         default:
           break;
@@ -157,34 +159,34 @@ void execute() {
       misc_ops = decode(misc);
       switch(misc_ops) {
         case MISC_PUSH:
-          addr = SP + dmem.getBase();
+          addr = SP;
           for(BitCount = 0; BitCount < 8; BitCount ++) {
             // If we push this register
             if((1 << BitCount) & misc.instr.push.reg_list) {
               dmem.write(addr, rf[BitCount]);
-              addr += 4;
+              addr -= 4;
             }
           }
           if(misc.instr.push.m) {
             dmem.write(addr, LR);
-            addr += 4;
+            addr -= 4;
           }
-          rf.write(SP_REG, addr - dmem.getBase());
+          rf.write(SP_REG, addr);
           break;
         case MISC_POP:
-        //  addr = SP;
-        //  for(BitCount = 0; BitCount < 8; BitCount ++) {
-        //    // If we push this register
-        //    if(1 << BitCount & misc.instr.push.reg_list) {
-        //      dmem.write(addr, rf[BitCount]);
-        //      addr += 4;
-        //    }
-        //  }
-        //  if(misc.instr.push.m) {
-        //    dmem.write(addr - diff, LR);
-        //    addr += 4;
-        //  }
-        //  rf.write(SP_REG, addr);
+          addr = SP;
+          for(BitCount = 0; BitCount < 8; BitCount ++) {
+            // If we push this register
+            if(1 << BitCount & misc.instr.push.reg_list) {
+              addr += 4;
+              rf.write(BitCount, dmem[addr]);
+            }
+          }
+          if(misc.instr.push.m) {
+            addr += 4;
+            rf.write(PC_REG, dmem[addr]);
+          }
+          rf.write(SP_REG, addr);
           break;
         case MISC_SUB:
           rf.write(SP_REG, SP - (misc.instr.sub.imm*4));
