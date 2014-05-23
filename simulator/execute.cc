@@ -20,7 +20,6 @@ ASPR flags;
 // and you'll need to fill in the rest of these.
 // See Page 99 of the armv6 manual
 static int checkCondition(unsigned short cond) {
-  cout << "TODO: " << dec << __LINE__ << endl;
   switch(cond) {
     case EQ:
       if (flags.Z == 1) {
@@ -28,30 +27,69 @@ static int checkCondition(unsigned short cond) {
       }
       break;
     case NE:
+      if (flags.Z == 0) {
+         return TRUE;
+      }
       break;
     case CS:
+      if (flags.C == 1) {
+         return TRUE;
+      }
       break;
     case CC:
+      if (flags.C == 0) {
+         return TRUE;
+      }
       break;
     case MI:
+      if (flags.N == 1) {
+         return TRUE;
+      }
       break;
     case PL:
+      if (flags.N == 0) {
+         return TRUE;
+      }
       break;
     case VS:
+      if (flags.V == 1) {
+         return TRUE;
+      }
       break;
     case VC:
+      if (flags.V == 0) {
+         return TRUE;
+      }
       break;
     case HI:
+      if (flags.C == 1 && flags.Z == 0) {
+         return TRUE;
+      }
       break;
     case LS:
+      if (flags.C == 0 || flags.Z == 1) {
+         return TRUE;
+      }
       break;
     case GE:
+      if (flags.N == flags.V) {
+         return TRUE;
+      }
       break;
     case LT:
+      if (flags.N != flags.V) {
+         return TRUE;
+      }
       break;
     case GT:
+      if (flags.Z == 0 && flags.N == flags.V) {
+         return TRUE;
+      }
       break;
     case LE:
+      if (flags.Z == 1 || flags.N != flags.V) {
+         return TRUE;
+      }
       break;
     case AL:
       return TRUE;
@@ -66,6 +104,8 @@ void execute() {
   unsigned int pctarget = PC + 2;
   unsigned int addr;
   int diff, BitCount, bit;
+  int x, y, result, sSum;
+  unsigned int uSum;
 
   /* Convert instruction to correct type */
   ALU_Type alu(instr);
@@ -118,7 +158,17 @@ void execute() {
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
           break;
         case ALU_CMP:
-          cout << "TODO: " << dec << __LINE__ << endl;
+          x = rf[alu.instr.cmp.rdn];
+          y = alu.instr.cmp.imm;
+          uSum = x + signExtend8to32ui(y * -1);
+          sSum = x - y;
+          result = uSum & 0x7fffffff;
+          // Update ASPR flags
+          flags.Z = result == 0;
+          flags.N = result < 0;
+          flags.C = uSum >> 31;
+          flags.V = result != sSum;
+
           break;
         case ALU_ADD8I:
           rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
@@ -211,7 +261,6 @@ void execute() {
       if (checkCondition(cond.instr.b.cond)){
         rf.write(PC_REG, PC + 2 * signExtend8to32ui(cond.instr.b.imm) + 2);
       }
-      cout << "TODO: " << dec << __LINE__ << endl;
       break;
     case UNCOND:
       decode(uncond);
