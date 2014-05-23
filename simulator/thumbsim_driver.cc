@@ -110,7 +110,7 @@ void Memory<Data32, Data32>::dump(DataType dt) const {
 bool Cache::access(unsigned int address) {
   unsigned int s = log2(entries.size());
   unsigned int n = log2(blocksize);
-  unsigned int tag = address >> (s + n);
+  unsigned int tag = address >> s + n;
   unsigned int index = (address >> n) & (1 << s) - 1;
 
   if (entries[index] == tag ) {
