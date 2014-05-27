@@ -337,7 +337,11 @@ int decode (const STM_Type data) {
 }
 
 int decode (const LDRL_Type data) {
-   cout << "LDRL_TYPE" << endl;
+   cout << dec;
+   if (opts.instrs) {
+      cout << "ldr r" << data.instr.ldrl.rt << ", [pc, #";
+      cout << data.instr.ldrl.imm * 4 << "]" << endl;
+   }
 }
 
 int decode (const ADD_SP_Type data) {
