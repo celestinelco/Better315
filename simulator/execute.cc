@@ -276,7 +276,8 @@ void execute() {
       break;
     case LDRL:
       decode(ldrl);
-      cout << "TODO: " << dec << __LINE__ << endl;
+      addr = PC + ldrl.instr.ldrl.imm * 4;
+      rf.write(ldrl.instr.ldrl.rt, dmem[addr]);
       break;
     case ADD_SP:
       decode(addsp);
