@@ -23,7 +23,7 @@ using namespace std;
 /* Defines for types and ops for decoding */
 #define ALU_TYPE 0
 #define SP_TYPE 17
-#define DP_TYPE 32
+#define DP_TYPE 16
 #define LD_ST_REG_OPA 5
 #define LD_ST_OPB_STR 0
 #define LD_ST_OPB_STRH 1
@@ -37,8 +37,8 @@ using namespace std;
 #define LD_ST_IMMB_OPA 7
 #define LD_ST_IMMH_OPA 8
 #define LD_ST_IMMSP_OPA 9
-#define LD_ST_ST 0
-#define LD_ST_LD 1
+#define LD_ST_STB 14 
+#define LD_ST_LDB 15
 #define UNCOND_TYPE 28
 #define ADD_SP_TYPE 21
 #define ALU_LSLI_OP 0
@@ -62,11 +62,8 @@ using namespace std;
 #define MISC_SUB_OP 1
 #define MISC_POP_OP 6
 #define ADD_SP8I_TYPE 22
+#define BL_TYPE 30
 
-// This enum could be put in thumbsim.hpp
-enum OFType { OF_ADD, OF_SUB, OF_SHIFT };
-
-void setCarryOverflow (int num1, int num2, OFType oftype);
 
 /* ALU Type Structs */
 struct ALU_LSLI_Instr {
@@ -287,6 +284,31 @@ struct COND_Type {
    } instr;
 };
 
+struct BL_Lower_Instr {
+  unsigned short imm11: 11;
+  unsigned short j2: 1;
+  unsigned short bit1: 1;
+  unsigned short j1: 1;
+  unsigned short op1: 2;
+};
+
+struct BL_Upper_Instr {
+  unsigned short imm10: 10;
+  unsigned short s: 1;
+  unsigned short op2: 5;
+}; 
+
+struct BL_Type {
+   union {
+      struct {
+         unsigned short data: 11;
+         unsigned short type_check: 5;
+      } class_type;
+      BL_Upper_Instr bl_upper;
+      BL_Lower_Instr bl_lower;
+   } instr;
+};
+
 /* Literal Type */
 struct LDRL_Instr {
    unsigned short imm: 8;
@@ -385,6 +407,7 @@ class ALL_Types{
          STM_Type stm;
          LDRL_Type ldrl;
          ADD_SP_Type addsp;
+         BL_Type bl;
       } type;
       ALL_Types() {}
       ALL_Types(const unsigned short & _type) {type.mem = _type;}
@@ -396,6 +419,36 @@ class ALL_Types{
 };
 static void printCond(char byte) {
    switch (byte) {
+      case 0:
+         cout << "eq";
+         break;
+      case 1:
+         cout << "ne";
+         break;
+      case 2:
+         cout << "cs";
+         break;
+      case 3:
+         cout << "cc";
+         break;
+      case 4:
+         cout << "mi";
+         break;
+      case 5:
+         cout << "pl";
+         break;
+      case 6:
+         cout << "vs";
+         break;
+      case 7:
+         cout << "vc";
+         break;
+      case 8:
+         cout << "hi";
+         break;
+      case 9:
+         cout << "ls";
+         break;
       case 10:
          cout << "ge";
          break;
@@ -442,6 +495,7 @@ class Data16 {
          STM_Type stm;
          LDRL_Type ldrl;
          ADD_SP_Type addsp;
+         BL_Type bl;
       } d;
    public:
       Data16() {}
@@ -489,6 +543,7 @@ class Data16 {
       operator STM_Type() const { return d.stm; }
       operator LDRL_Type() const { return d.ldrl; }
       operator ADD_SP_Type() const { return d.addsp; }
+      operator BL_Type() const { return d.bl; }
 };
 
 class Data32 {
@@ -538,6 +593,11 @@ class Data32 {
          cout << hex << d.data_uint() << endl;
       }
 };
+
+enum OFType { OF_ADD, OF_SUB, OF_SHIFT };
+void setCarryOverflow (int num1, int num2, OFType oftype);
+void setFlags(int num1, int num2, OFType oftype);
+
 enum MemType { MEM_MEM, MEM_RF, MEM_INVALID };
 
 enum DataType { INSTRUCTIONS, DATA };
@@ -686,6 +746,7 @@ typedef enum Thumb_Types {
    STM,
    LDRL,
    ADD_SP,
+   BL,
    ERROR_TYPE
 } Thumb_Types;
 
@@ -766,6 +827,11 @@ typedef enum MISC_Ops {
    MISC_HINT
 } MISC_Ops;
 
+typedef enum BL_Ops {
+  BL_UPPER,
+  BL_LOWER
+} BL_Ops;
+
 typedef struct APSR {
    unsigned char N;
    unsigned char Z;
@@ -794,6 +860,7 @@ DP_Ops decode (const DP_Type);
 SP_Ops decode (const SP_Type);
 LD_ST_Ops decode (const LD_ST_Type);
 MISC_Ops decode (const MISC_Type);
+BL_Ops decode (const BL_Type);
 int decode (const COND_Type);
 int decode (const UNCOND_Type);
 int decode (const LDM_Type);

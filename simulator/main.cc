@@ -1,6 +1,8 @@
 #include "thumbsim.hpp"
 #include "unistd.h"
 
+Caches caches(0);
+Stats stats;
 Memory<Data16,Data16> imem(0x8000);
 Memory<Data8,Data32> dmem(0xffff0000);
 Memory<Data32,Data32> rf(16, Data32(0));
@@ -28,7 +30,7 @@ int main(int argc, char ** argv) {
       opts.stats = true;
       break;
     case 'c':
-      //caches = Caches(atoi(optarg));
+      caches = Caches(atoi(optarg));
       break;
     case 'f':
       filename = optarg;
@@ -63,8 +65,8 @@ int main(int argc, char ** argv) {
   }
 
   if (opts.stats) {
-    //stats.print();
-    //caches.printStats();
+    stats.print();
+    caches.printStats();
   }
 
   return 0;

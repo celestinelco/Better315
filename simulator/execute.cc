@@ -134,43 +134,45 @@ void execute() {
       add_ops = decode(alu);
       switch(add_ops) {
         case ALU_LSLI:
+          cout << "TODO: " << dec << __LINE__ << endl;
           rf.write(alu.instr.lsli.rd, rf[alu.instr.lsli.rm] << alu.instr.lsli.imm);
           break;
         case ALU_LSRI:
+          cout << "TODO: " << dec << __LINE__ << endl;
           rf.write(alu.instr.lsli.rd, rf[alu.instr.lsli.rm] >> alu.instr.lsli.imm);
           break;
         case ALU_ASRI:
           cout << "TODO: " << dec << __LINE__ << endl;
           break;
         case ALU_ADDR:
+          setFlags(rf[alu.instr.addr.rn], rf[alu.instr.addr.rm], OF_ADD);
           rf.write(alu.instr.addr.rd, rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
           break;
         case ALU_SUBR:
-          rf.write(alu.instr.addr.rd, rf[alu.instr.addr.rn] - rf[alu.instr.addr.rm]);
+          setFlags(rf[alu.instr.subr.rn], rf[alu.instr.subr.rm], OF_SUB);
+          rf.write(alu.instr.subr.rd, rf[alu.instr.subr.rn] - rf[alu.instr.subr.rm]);
           break;
         case ALU_ADD3I:
+          setFlags(rf[alu.instr.add3i.rn], alu.instr.add3i.imm, OF_SUB);
           rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
           break;
         case ALU_SUB3I:
+          setFlags(rf[alu.instr.sub3i.rn], alu.instr.sub3i.imm, OF_SUB);
           rf.write(alu.instr.sub3i.rd, rf[alu.instr.sub3i.rn] - alu.instr.sub3i.imm);
           break;
         case ALU_MOV:
+          setFlags(alu.instr.mov.imm, 0, OF_ADD);
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
           break;
         case ALU_CMP:
-          x = rf[alu.instr.cmp.rdn];
-          y = alu.instr.cmp.imm;
-          result = x - y;
-          // Update ASPR flags
-          flags.Z = result == 0;
-          flags.N = result < 0;
-          setCarryOverflow(x, y, OF_SUB);
-
+          setFlags(rf[alu.instr.cmp.rdn], alu.instr.cmp.imm, OF_SUB);
           break;
         case ALU_ADD8I:
+          setFlags(rf[alu.instr.add8i.rdn], alu.instr.add8i.imm, OF_SUB);
           rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
           break;
         case ALU_SUB8I:
+          setFlags(rf[alu.instr.sub8i.rdn], alu.instr.sub8i.imm, OF_SUB);
           rf.write(alu.instr.sub8i.rdn, rf[alu.instr.sub8i.rdn] - alu.instr.sub8i.imm);
           break;
         default:
@@ -202,10 +204,14 @@ void execute() {
       switch(ldst_ops) {
         case STRR:
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
+          caches.access(addr);
+          stats.numMemWrites ++;
           dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt]);
           break;
         case LDRR:
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
+          caches.access(addr);
+          stats.numMemReads ++;
           rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr]);
           break;
       }
@@ -219,11 +225,15 @@ void execute() {
             // If we push this register
             if((1 << BitCount) & misc.instr.push.reg_list) {
               dmem.write(addr, rf[BitCount]);
+              caches.access(addr);
+              stats.numMemWrites ++;
               addr -= 4;
             }
           }
           if(misc.instr.push.m) {
             dmem.write(addr, LR);
+            caches.access(addr);
+            stats.numMemWrites ++;
             addr -= 4;
           }
           rf.write(SP_REG, addr);
@@ -234,11 +244,15 @@ void execute() {
             // If we push this register
             if(1 << BitCount & misc.instr.push.reg_list) {
               addr += 4;
+              caches.access(addr);
+              stats.numMemReads ++;
               rf.write(BitCount, dmem[addr]);
             }
           }
           if(misc.instr.push.m) {
             addr += 4;
+            caches.access(addr);
+            stats.numMemReads ++;
             rf.write(PC_REG, dmem[addr]);
           }
           rf.write(SP_REG, addr);
@@ -255,8 +269,19 @@ void execute() {
       decode(cond);
       // Once you've completed the checkCondition function,
       // this should work for all your conditional branches.
+      int offset = 2 * signExtend8to32ui(cond.instr.b.imm) + 2;
       if (checkCondition(cond.instr.b.cond)){
-        rf.write(PC_REG, PC + 2 * signExtend8to32ui(cond.instr.b.imm) + 2);
+        if (offset > 0)
+          stats.numForwardBranchesTaken ++;
+        else
+          stats.numBackwardBranchesTaken ++;
+        rf.write(PC_REG, PC + offset);
+      }
+      else {
+        if (offset > 0)
+          stats.numForwardBranchesNotTaken ++;
+        else
+          stats.numBackwardBranchesNotTaken ++;
       }
       break;
     case UNCOND:
@@ -271,6 +296,8 @@ void execute() {
         if((1 << BitCount) & ldm.instr.ldm.reg_list) {
           addr += 4;
           rf.write(BitCount, dmem[addr]);
+          caches.access(addr);
+          stats.numMemReads ++;
         }
       }
       break;
@@ -281,6 +308,8 @@ void execute() {
         // If we push this register
         if(1 << BitCount & stm.instr.stm.reg_list) {
           dmem.write(addr, rf[BitCount]);
+          caches.access(addr);
+          stats.numMemWrites ++;
           addr -= 4;
         }
       }
@@ -301,10 +330,34 @@ void execute() {
       exit(1);
       break;
   }
+
+  stats.instrs ++;
+}
+
+void setFlags(int num1, int num2, OFType oftype) {
+   int result;
+   switch(oftype) {
+   case OF_ADD:
+      result = num1 + num2;
+      break;
+   case OF_SUB:
+      result = num1 - num2;
+      break;
+   case OF_SHIFT:
+      result = num1 << num2;
+      break;
+   default:
+      cerr << "Bad OverFlow Type encountered." << __LINE__ << __FILE__ << endl;
+      return(1);
+   }
+
+   flags.Z = result == 0;
+   flags.N = result < 0;
+
+   setCarryOverflow(num1, num2, oftype);
 }
 
 void setCarryOverflow (int num1, int num2, OFType oftype) {
-
   switch (oftype) {
     case OF_ADD:
       if (((unsigned long long int)num1 + (unsigned long long int)num2) ==
