@@ -63,6 +63,9 @@ using namespace std;
 #define MISC_POP_OP 6
 #define ADD_SP8I_TYPE 22
 
+// This enum could be put in thumbsim.hpp
+enum OFType { OF_ADD, OF_SUB, OF_SHIFT };
+
 /* ALU Type Structs */
 struct ALU_LSLI_Instr {
    unsigned short rd: 3;

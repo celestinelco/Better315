@@ -23,6 +23,8 @@
 *.swp
 
 simulator/thumbsim.dSYM/
+simulator/thumbsim.dSYM/*
+simulator/thumbsim.out.dSYM/
+simulator/thumbsim.out.dSYM/*
 thumbsim
 .DS_STORE
-thumbsim.out.dSYM/

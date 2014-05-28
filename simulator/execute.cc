@@ -134,10 +134,10 @@ void execute() {
       add_ops = decode(alu);
       switch(add_ops) {
         case ALU_LSLI:
-          cout << "TODO: " << dec << __LINE__ << endl;
+          rf.write(alu.instr.lsli.rd, rf[alu.instr.lsli.rm] << alu.instr.lsli.imm);
           break;
         case ALU_LSRI:
-          cout << "TODO: " << dec << __LINE__ << endl;
+          rf.write(alu.instr.lsli.rd, rf[alu.instr.lsli.rm] >> alu.instr.lsli.imm);
           break;
         case ALU_ASRI:
           cout << "TODO: " << dec << __LINE__ << endl;
@@ -146,7 +146,7 @@ void execute() {
           rf.write(alu.instr.addr.rd, rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
           break;
         case ALU_SUBR:
-          cout << "TODO: " << dec << __LINE__ << endl;
+          rf.write(alu.instr.addr.rd, rf[alu.instr.addr.rn] - rf[alu.instr.addr.rm]);
           break;
         case ALU_ADD3I:
           rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
@@ -160,14 +160,11 @@ void execute() {
         case ALU_CMP:
           x = rf[alu.instr.cmp.rdn];
           y = alu.instr.cmp.imm;
-          uSum = x + signExtend8to32ui(y * -1);
-          sSum = x - y;
-          result = uSum & 0x7fffffff;
+          result = x - y;
           // Update ASPR flags
           flags.Z = result == 0;
           flags.N = result < 0;
-          flags.C = uSum >> 31;
-          flags.V = result != sSum;
+          setCarryOverflow(x, y, OF_SUB);
 
           break;
         case ALU_ADD8I:
@@ -268,16 +265,32 @@ void execute() {
       break;
     case LDM:
       decode(ldm);
-      cout << "TODO: " << dec << __LINE__ << endl;
+      addr = rf[ldm.instr.ldm.rn];
+      for(BitCount = 0; BitCount < 8; BitCount ++) {
+        // If we push this register
+        if((1 << BitCount) & ldm.instr.ldm.reg_list) {
+          addr += 4;
+          rf.write(BitCount, dmem[addr]);
+        }
+      }
       break;
     case STM:
       decode(stm);
-      cout << "TODO: " << dec << __LINE__ << endl;
+      addr = rf[stm.instr.stm.rn];
+      for(BitCount = 0; BitCount < 8; BitCount ++) {
+        // If we push this register
+        if(1 << BitCount & stm.instr.stm.reg_list) {
+          dmem.write(addr, rf[BitCount]);
+          addr -= 4;
+        }
+      }
       break;
     case LDRL:
+      cout << "PC: " << PC << endl;
       decode(ldrl);
-      addr = PC + ldrl.instr.ldrl.imm * 4;
-      rf.write(ldrl.instr.ldrl.rt, dmem[addr]);
+      addr = PC + ldrl.instr.ldrl.imm * 2;
+      rf.write(ldrl.instr.ldrl.rt, signExtend16to32ui(imem[addr]));
+      cout << "r" << ldrl.instr.ldrl.rt << ": " << hex << rf[ldrl.instr.ldrl.rt] << endl;
       break;
     case ADD_SP:
       decode(addsp);
@@ -287,5 +300,60 @@ void execute() {
       cout << "[ERROR] Unknown Instruction to be executed" << endl;
       exit(1);
       break;
+  }
+}
+
+void setCarryOverflow (int num1, int num2, OFType oftype) {
+
+  switch (oftype) {
+    case OF_ADD:
+      if (((unsigned long long int)num1 + (unsigned long long int)num2) ==
+          ((unsigned int)num1 + (unsigned int)num2)) {
+        flags.C = 0;
+      }
+      else {
+        flags.C = 1;
+      }
+      if (((long long int)num1 + (long long int)num2) ==
+          ((int)num1 + (int)num2)) {
+        flags.V = 0;
+      }
+      else {
+        flags.V = 1;
+      }
+      break;
+    case OF_SUB:
+      if (((unsigned long long int)num1 - (unsigned long long int)num2) ==
+          ((unsigned int)num1 - (unsigned int)num2)) {
+        flags.C = 0;
+      }
+      else {
+        flags.C = 1;
+      }
+      if (((num1==0) && (num2==0)) || 
+          (((long long int)num1 - (long long int)num2) ==
+          ((int)num1 - (int)num2))) {
+        flags.V = 0;
+      }
+      else {
+        flags.V = 1;
+      }
+      break;
+    case OF_SHIFT:
+      // C flag unaffected for shifts by zero
+      if (num2 != 0) {
+        if (((unsigned long long int)num1 << (unsigned long long int)num2) ==
+            ((unsigned int)num1 << (unsigned int)num2)) {
+          flags.C = 0;
+        }
+        else {
+          flags.C = 1;
+        }
+      }
+      // Shift doesn't set overflow
+      break;
+    default:
+      cerr << "Bad OverFlow Type encountered." << __LINE__ << __FILE__ << endl;
+      exit(1);
   }
 }
