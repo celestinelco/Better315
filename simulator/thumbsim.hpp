@@ -66,6 +66,8 @@ using namespace std;
 // This enum could be put in thumbsim.hpp
 enum OFType { OF_ADD, OF_SUB, OF_SHIFT };
 
+void setCarryOverflow (int num1, int num2, OFType oftype);
+
 /* ALU Type Structs */
 struct ALU_LSLI_Instr {
    unsigned short rd: 3;
