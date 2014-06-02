@@ -14,6 +14,7 @@ DP_Ops decode (const DP_Type);
 SP_Ops decode (const SP_Type);
 LD_ST_Ops decode (const LD_ST_Type);
 MISC_Ops decode (const MISC_Type);
+BL_Ops decode (const BL_Type);
 int decode (const COND_Type);
 int decode (const UNCOND_Type);
 int decode (const LDM_Type);
@@ -51,6 +52,9 @@ Thumb_Types decode (const ALL_Types data) {
    }
    else if (data.type.addsp.instr.class_type.type_check == ADD_SP_TYPE) {
       return ADD_SP;
+   }
+   else if (data.type.bl.instr.class_type.type_check == BL_TYPE) {
+      return BL;
    }
    else {
       if (data.type.ld_st.instr.class_type.opA == LD_ST_REG_OPA) {
@@ -121,8 +125,9 @@ ALU_Ops decode (const ALU_Type data) {
    }
 
 }
+
 DP_Ops decode (const DP_Type data) {
-   cout << "DP_TYPE" << endl;
+   return static_cast<DP_Ops>(data.instr.DP_Instr.op);
 }
 
 SP_Ops decode (const SP_Type data) {
@@ -333,7 +338,58 @@ int decode (const LDM_Type data) {
 }
 
 int decode (const STM_Type data) {
-   cout << "STM_TYPE" << endl;
+   bool multiple = FALSE;
+   cout << "stm ";
+   cout << "r" << data.instr.stm.rn;
+   cout << ", {";
+   if (data.instr.stm.reg_list & 1) {
+      cout << "r0";
+      multiple = TRUE;
+   }
+   if (data.instr.stm.reg_list & 2) {
+      if (multiple)
+         cout << ", ";
+      cout << "r1";
+      multiple = TRUE;
+   }
+   if (data.instr.stm.reg_list & 4) {
+      if (multiple)
+         cout << ", ";
+      cout << "r2";
+      multiple = TRUE;
+   }
+   if (data.instr.stm.reg_list & 8) {
+      if (multiple)
+         cout << ", ";
+      cout << "r3";
+      multiple = TRUE;
+   }
+   if (data.instr.stm.reg_list & 16) {
+      if (multiple)
+         cout << ", ";
+      cout << "r4";
+      multiple = TRUE;
+   }
+   if (data.instr.stm.reg_list & 32) {
+      if (multiple)
+         cout << ", ";
+      cout << "r5";
+      multiple = TRUE;
+   }
+   if (data.instr.stm.reg_list & 64) {
+      if (multiple)
+         cout << ", ";
+      cout << "r6";
+      multiple = TRUE;
+   }
+   if (data.instr.stm.reg_list & 128) {
+      if (multiple)
+         cout << ", ";
+      cout << "r7";
+      multiple = TRUE;
+   }
+   cout << "}" << endl;
+   return STM_TYPE;
 }
 
 int decode (const LDRL_Type data) {
@@ -350,3 +406,9 @@ int decode (const ADD_SP_Type data) {
    }
 }
 
+BL_Ops decode (const BL_Type data) {
+  if (opts.instrs) { 
+    cout << "bl 0x" << hex << data.instr.bl_upper.imm10 << endl;
+  }
+  return BL_UPPER;
+}

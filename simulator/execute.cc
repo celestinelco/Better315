@@ -99,13 +99,14 @@ static int checkCondition(unsigned short cond) {
 }
 
 void execute() {
-  Data16 instr = imem[PC];
+  Data16 instr = imem[PC], instr2;
   Thumb_Types itype;
   unsigned int pctarget = PC + 2;
   unsigned int addr;
   int diff, BitCount, bit;
   int x, y, result, sSum;
   unsigned int uSum;
+  int offset;
 
   /* Convert instruction to correct type */
   ALU_Type alu(instr);
@@ -119,12 +120,14 @@ void execute() {
   STM_Type stm(instr);
   LDRL_Type ldrl(instr);
   ADD_SP_Type addsp(instr);
+  BL_Type blupper(instr);
 
   ALU_Ops add_ops;
   DP_Ops dp_ops;
   SP_Ops sp_ops;
   LD_ST_Ops ldst_ops;
   MISC_Ops misc_ops;
+  BL_Ops bl_ops;
 
   rf.write(PC_REG, pctarget);
 
@@ -180,9 +183,14 @@ void execute() {
       }
       break;
     case DP:
-      decode(dp);
-      cout << "TODO: " << dec << __LINE__ << endl;
-      break;
+      dp_ops = decode(dp);
+      switch(dp_ops) {
+      case DP_CMP:
+         setFlags(rf[dp.instr.DP_Instr.rdn], rf[dp.instr.DP_Instr.rm], OF_SUB);
+         break; 
+      default:
+         cout << "TODO: DP(" << dp_ops << ")" << endl;
+      }
       break;
     case SPECIAL:
       sp_ops = decode(sp);
@@ -269,7 +277,7 @@ void execute() {
       decode(cond);
       // Once you've completed the checkCondition function,
       // this should work for all your conditional branches.
-      int offset = 2 * signExtend8to32ui(cond.instr.b.imm) + 2;
+      offset = 2 * signExtend8to32ui(cond.instr.b.imm) + 2;
       if (checkCondition(cond.instr.b.cond)){
         if (offset > 0)
           stats.numForwardBranchesTaken ++;
@@ -315,16 +323,40 @@ void execute() {
       }
       break;
     case LDRL:
-      cout << "PC: " << PC << endl;
       decode(ldrl);
-      addr = PC + ldrl.instr.ldrl.imm * 2;
+      addr = PC + ldrl.instr.ldrl.imm * 4 - 2;
       rf.write(ldrl.instr.ldrl.rt, signExtend16to32ui(imem[addr]));
-      cout << "r" << ldrl.instr.ldrl.rt << ": " << hex << rf[ldrl.instr.ldrl.rt] << endl;
       break;
     case ADD_SP:
       decode(addsp);
       rf.write(addsp.instr.add.rd, SP + (addsp.instr.add.imm*4));
       break;
+    case BL:
+      bl_ops = decode(blupper);
+      if (bl_ops == BL_UPPER) {
+        // PC has already been incremented above
+        instr2 = imem[PC];
+        BL_Type bllower(instr2);
+        if (blupper.instr.bl_upper.s) {
+          addr = static_cast<int>(0xff<<24) | 
+                 ((~(bllower.instr.bl_lower.j1 ^ blupper.instr.bl_upper.s))<<23) | 
+                 ((~(bllower.instr.bl_lower.j2 ^ blupper.instr.bl_upper.s))<<22) | 
+                 ((blupper.instr.bl_upper.imm10)<<12) | 
+                 ((bllower.instr.bl_lower.imm11)<<1);
+        }
+        else { 
+          addr = ((blupper.instr.bl_upper.imm10)<<12) | 
+                 ((bllower.instr.bl_lower.imm11)<<1); 
+        }
+        // return address is 4-bytes away from the start of the BL insn 
+        rf.write(LR_REG, PC + 2); 
+        // Target address is also computed from that point 
+        rf.write(PC_REG, PC + 2 + addr); 
+      }
+      else {
+        cerr << "Bad BL format." << endl; exit(1); 
+      }
+      break; 
     default:
       cout << "[ERROR] Unknown Instruction to be executed" << endl;
       exit(1);
