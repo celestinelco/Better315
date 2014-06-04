@@ -130,6 +130,7 @@ void execute() {
   BL_Ops bl_ops;
 
   rf.write(PC_REG, pctarget);
+  stats.numRegWrites ++;
 
   itype = decode(ALL_Types(instr));
   switch(itype) {
@@ -137,12 +138,14 @@ void execute() {
       add_ops = decode(alu);
       switch(add_ops) {
         case ALU_LSLI:
-          cout << "TODO: " << dec << __LINE__ << endl;
           rf.write(alu.instr.lsli.rd, rf[alu.instr.lsli.rm] << alu.instr.lsli.imm);
+          stats.numRegReads ++;
+          stats.numRegWrites ++;
           break;
         case ALU_LSRI:
-          cout << "TODO: " << dec << __LINE__ << endl;
           rf.write(alu.instr.lsli.rd, rf[alu.instr.lsli.rm] >> alu.instr.lsli.imm);
+          stats.numRegReads ++;
+          stats.numRegWrites ++;
           break;
         case ALU_ASRI:
           cout << "TODO: " << dec << __LINE__ << endl;
@@ -150,33 +153,47 @@ void execute() {
         case ALU_ADDR:
           setFlags(rf[alu.instr.addr.rn], rf[alu.instr.addr.rm], OF_ADD);
           rf.write(alu.instr.addr.rd, rf[alu.instr.addr.rn] + rf[alu.instr.addr.rm]);
+          stats.numRegReads += 2;
+          stats.numRegWrites ++;
           break;
         case ALU_SUBR:
           setFlags(rf[alu.instr.subr.rn], rf[alu.instr.subr.rm], OF_SUB);
           rf.write(alu.instr.subr.rd, rf[alu.instr.subr.rn] - rf[alu.instr.subr.rm]);
+          stats.numRegReads += 2;
+          stats.numRegWrites ++;
           break;
         case ALU_ADD3I:
           setFlags(rf[alu.instr.add3i.rn], alu.instr.add3i.imm, OF_SUB);
           rf.write(alu.instr.add3i.rd, rf[alu.instr.add3i.rn] + alu.instr.add3i.imm);
+          stats.numRegReads ++;
+          stats.numRegWrites ++;
           break;
         case ALU_SUB3I:
           setFlags(rf[alu.instr.sub3i.rn], alu.instr.sub3i.imm, OF_SUB);
           rf.write(alu.instr.sub3i.rd, rf[alu.instr.sub3i.rn] - alu.instr.sub3i.imm);
+          stats.numRegReads ++;
+          stats.numRegWrites ++;
           break;
         case ALU_MOV:
           setFlags(alu.instr.mov.imm, 0, OF_ADD);
           rf.write(alu.instr.mov.rdn, alu.instr.mov.imm);
+          stats.numRegWrites ++;
           break;
         case ALU_CMP:
           setFlags(rf[alu.instr.cmp.rdn], alu.instr.cmp.imm, OF_SUB);
+          stats.numRegReads ++;
           break;
         case ALU_ADD8I:
           setFlags(rf[alu.instr.add8i.rdn], alu.instr.add8i.imm, OF_SUB);
           rf.write(alu.instr.add8i.rdn, rf[alu.instr.add8i.rdn] + alu.instr.add8i.imm);
+          stats.numRegReads ++;
+          stats.numRegWrites ++;
           break;
         case ALU_SUB8I:
           setFlags(rf[alu.instr.sub8i.rdn], alu.instr.sub8i.imm, OF_SUB);
           rf.write(alu.instr.sub8i.rdn, rf[alu.instr.sub8i.rdn] - alu.instr.sub8i.imm);
+          stats.numRegReads ++;
+          stats.numRegWrites ++;
           break;
         default:
           break;
@@ -187,6 +204,7 @@ void execute() {
       switch(dp_ops) {
       case DP_CMP:
          setFlags(rf[dp.instr.DP_Instr.rdn], rf[dp.instr.DP_Instr.rm], OF_SUB);
+         stats.numRegReads += 2;
          break; 
       default:
          cout << "TODO: DP(" << dp_ops << ")" << endl;
@@ -198,9 +216,13 @@ void execute() {
         case SP_MOV:
           if (sp.instr.mov.d) {
             rf.write(SP_REG, rf[sp.instr.mov.rm]);
+            stats.numRegReads ++;
+            stats.numRegWrites ++;
           }
           else {
             rf.write(sp.instr.mov.rd, rf[sp.instr.mov.rm]);
+            stats.numRegReads ++;
+            stats.numRegWrites ++;
           }
           break;
       }
@@ -213,14 +235,20 @@ void execute() {
         case STRR:
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
           caches.access(addr);
+          stats.numRegReads ++;
           stats.numMemWrites ++;
+
           dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt]);
+          stats.numRegReads ++;
           break;
         case LDRR:
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
           caches.access(addr);
+          stats.numRegReads ++;
           stats.numMemReads ++;
+
           rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr]);
+          stats.numRegWrites ++;
           break;
       }
       break;
@@ -229,11 +257,13 @@ void execute() {
       switch(misc_ops) {
         case MISC_PUSH:
           addr = SP;
+          stats.numRegReads ++;
           for(BitCount = 0; BitCount < 8; BitCount ++) {
             // If we push this register
             if((1 << BitCount) & misc.instr.push.reg_list) {
               dmem.write(addr, rf[BitCount]);
               caches.access(addr);
+              stats.numRegReads ++;
               stats.numMemWrites ++;
               addr -= 4;
             }
@@ -241,13 +271,16 @@ void execute() {
           if(misc.instr.push.m) {
             dmem.write(addr, LR);
             caches.access(addr);
+            stats.numRegReads ++;
             stats.numMemWrites ++;
             addr -= 4;
           }
           rf.write(SP_REG, addr);
+          stats.numRegWrites ++;
           break;
         case MISC_POP:
           addr = SP;
+          stats.numRegReads ++;
           for(BitCount = 0; BitCount < 8; BitCount ++) {
             // If we push this register
             if(1 << BitCount & misc.instr.push.reg_list) {
@@ -255,21 +288,26 @@ void execute() {
               caches.access(addr);
               stats.numMemReads ++;
               rf.write(BitCount, dmem[addr]);
+              stats.numRegWrites ++;
             }
           }
           if(misc.instr.push.m) {
             addr += 4;
             caches.access(addr);
-            stats.numMemReads ++;
             rf.write(PC_REG, dmem[addr]);
+            stats.numMemReads ++;
+            stats.numRegWrites ++;
           }
           rf.write(SP_REG, addr);
+          stats.numRegWrites ++;
           break;
         case MISC_SUB:
           rf.write(SP_REG, SP - (misc.instr.sub.imm*4));
+          stats.numRegWrites ++;
           break;
         case MISC_ADD:
           rf.write(SP_REG, SP + (misc.instr.add.imm*4));
+          stats.numRegWrites ++;
           break;
       }
       break;
@@ -284,6 +322,7 @@ void execute() {
         else
           stats.numBackwardBranchesTaken ++;
         rf.write(PC_REG, PC + offset);
+        stats.numRegWrites ++;
       }
       else {
         if (offset > 0)
@@ -295,15 +334,18 @@ void execute() {
     case UNCOND:
       decode(uncond);
       rf.write(PC_REG, PC + 2 * signExtend8to32ui(uncond.instr.b.imm) + 2);
+      stats.numRegWrites ++;
       break;
     case LDM:
       decode(ldm);
       addr = rf[ldm.instr.ldm.rn];
+      stats.numRegReads ++;
       for(BitCount = 0; BitCount < 8; BitCount ++) {
         // If we push this register
         if((1 << BitCount) & ldm.instr.ldm.reg_list) {
           addr += 4;
           rf.write(BitCount, dmem[addr]);
+          stats.numRegWrites ++;
           caches.access(addr);
           stats.numMemReads ++;
         }
@@ -312,24 +354,30 @@ void execute() {
     case STM:
       decode(stm);
       addr = rf[stm.instr.stm.rn];
+      stats.numRegReads ++;
       for(BitCount = 0; BitCount < 8; BitCount ++) {
         // If we push this register
         if(1 << BitCount & stm.instr.stm.reg_list) {
           dmem.write(addr, rf[BitCount]);
+          stats.numRegReads ++;
           caches.access(addr);
           stats.numMemWrites ++;
-          addr -= 4;
+          addr += 4;
         }
       }
+      rf.write(stm.instr.stm.rn, addr);
+      stats.numRegWrites ++;
       break;
     case LDRL:
       decode(ldrl);
       addr = PC + ldrl.instr.ldrl.imm * 4 - 2;
       rf.write(ldrl.instr.ldrl.rt, signExtend16to32ui(imem[addr]));
+      stats.numRegWrites ++;
       break;
     case ADD_SP:
       decode(addsp);
       rf.write(addsp.instr.add.rd, SP + (addsp.instr.add.imm*4));
+      stats.numRegWrites ++;
       break;
     case BL:
       bl_ops = decode(blupper);
@@ -350,8 +398,10 @@ void execute() {
         }
         // return address is 4-bytes away from the start of the BL insn 
         rf.write(LR_REG, PC + 2); 
+        stats.numRegWrites ++;
         // Target address is also computed from that point 
         rf.write(PC_REG, PC + 2 + addr); 
+        stats.numRegWrites ++;
       }
       else {
         cerr << "Bad BL format." << endl; exit(1); 

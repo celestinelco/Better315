@@ -127,6 +127,13 @@ ALU_Ops decode (const ALU_Type data) {
 }
 
 DP_Ops decode (const DP_Type data) {
+   switch(data.instr.DP_Instr.op) {
+   case DP_CMP:
+      cout << "cmp r" << data.instr.DP_Instr.rdn << ", r" << data.instr.DP_Instr.rm << endl;
+      break;
+   default:
+      cout << "TODO: " << __LINE__ << endl;
+   }
    return static_cast<DP_Ops>(data.instr.DP_Instr.op);
 }
 
@@ -339,9 +346,9 @@ int decode (const LDM_Type data) {
 
 int decode (const STM_Type data) {
    bool multiple = FALSE;
-   cout << "stm ";
+   cout << "stmia ";
    cout << "r" << data.instr.stm.rn;
-   cout << ", {";
+   cout << "!, {";
    if (data.instr.stm.reg_list & 1) {
       cout << "r0";
       multiple = TRUE;
