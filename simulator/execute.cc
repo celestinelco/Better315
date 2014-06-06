@@ -103,9 +103,8 @@ void execute() {
   Thumb_Types itype;
   unsigned int pctarget = PC + 2;
   unsigned int addr;
-  int diff, BitCount, bit;
-  int x, y, result, sSum;
-  unsigned int uSum;
+  int BitCount;
+  int result;
   int offset;
 
   /* Convert instruction to correct type */
