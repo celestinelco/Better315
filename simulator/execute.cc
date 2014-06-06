@@ -232,7 +232,7 @@ void execute() {
       // to implement ldrb/strb, ldm/stm and push/pop
       ldst_ops = decode(ld_st);
       switch(ldst_ops) {
-        case STRR:
+        case STRI:
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
           caches.access(addr);
           stats.numRegReads ++;
@@ -241,7 +241,7 @@ void execute() {
           dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt]);
           stats.numRegReads ++;
           break;
-        case LDRR:
+        case LDRI:
           addr = rf[ld_st.instr.ld_st_imm.rn] + ld_st.instr.ld_st_imm.imm * 4;
           caches.access(addr);
           stats.numRegReads ++;
@@ -250,6 +250,8 @@ void execute() {
           rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr]);
           stats.numRegWrites ++;
           break;
+        default:
+          cout << "TODO: " << ldst_ops << endl;
       }
       break;
     case MISC:
@@ -281,7 +283,14 @@ void execute() {
         case MISC_POP:
           addr = SP;
           stats.numRegReads ++;
-          for(BitCount = 0; BitCount < 8; BitCount ++) {
+          if(misc.instr.push.m) {
+            addr += 4;
+            caches.access(addr);
+            rf.write(PC_REG, dmem[addr]);
+            stats.numMemReads ++;
+            stats.numRegWrites ++;
+          }
+          for(BitCount = 7; BitCount >= 0; BitCount --) {
             // If we push this register
             if(1 << BitCount & misc.instr.push.reg_list) {
               addr += 4;
@@ -290,13 +299,6 @@ void execute() {
               rf.write(BitCount, dmem[addr]);
               stats.numRegWrites ++;
             }
-          }
-          if(misc.instr.push.m) {
-            addr += 4;
-            caches.access(addr);
-            rf.write(PC_REG, dmem[addr]);
-            stats.numMemReads ++;
-            stats.numRegWrites ++;
           }
           rf.write(SP_REG, addr);
           stats.numRegWrites ++;
