@@ -430,7 +430,6 @@ void setFlags(int num1, int num2, OFType oftype) {
       break;
    default:
       cerr << "Bad OverFlow Type encountered." << __LINE__ << __FILE__ << endl;
-      return(1);
    }
 
    flags.Z = result == 0;

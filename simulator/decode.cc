@@ -77,13 +77,22 @@ Thumb_Types decode (const ALL_Types data) {
 
 ALU_Ops decode (const ALU_Type data) {
    if (data.instr.lsli.op == ALU_LSLI_OP) {
-
+       if (opts.instrs) { 
+         cout << "lsls r" << data.instr.lsli.rd  << ", r" << data.instr.lsli.rm << ", #" << data.instr.lsli.imm << endl;
+      }
+      return ALU_LSLI;
    }
    else if (data.instr.lsri.op == ALU_LSRI_OP) {
-
+       if (opts.instrs) { 
+         cout << "lsrs r" << data.instr.lsri.rd  << ", r" << data.instr.lsri.rm << ", #" << data.instr.lsri.imm << endl;
+      }
+      return ALU_LSRI;
    }
    else if (data.instr.asri.op == ALU_ASRI_OP) {
-
+       if (opts.instrs) { 
+         cout << "asri r" << data.instr.asri.rd  << ", r" << data.instr.asri.rm << ", #" << data.instr.asri.imm << endl;
+      }
+      return ALU_ASRI;
    }
    else if (data.instr.addr.op == ALU_ADDR_OP) {
       if (opts.instrs) { 
@@ -123,7 +132,7 @@ ALU_Ops decode (const ALU_Type data) {
    }
    else if (data.instr.cmp.op == ALU_CMP_OP) { 
       if (opts.instrs) { 
-         cout << "cmp r" << data.instr.cmp.rdn << ", #" << data.instr.cmp.imm << endl;
+         cout << "cmp r" << data.instr.cmp.rdn << ", #" << dec << data.instr.cmp.imm << endl;
       }
       return ALU_CMP;
    }
@@ -173,7 +182,7 @@ SP_Ops decode (const SP_Type data) {
             cout << " sp, sp, r" << data.instr.mov.rm << endl;
          }
          else {
-            cout << " r" << data.instr.mov.rd << ", r" << data.instr.mov.rm << endl;
+            cout << " r" << data.instr.mov.rd << ", r" << data.instr.mov.rd << ", r" << data.instr.mov.rm << endl;
          }
       }
    }
@@ -189,8 +198,6 @@ LD_ST_Ops decode (const LD_ST_Type data) {
         if (data.instr.class_type.opB == LD_ST_OPB_LDRB) {
             cout << "ldrb r" << data.instr.ld_st_reg.rt << ", [r";
             cout << data.instr.ld_st_reg.rn << ", r" << data.instr.ld_st_reg.rm << "]" << endl;
-
-                //rt, rn, rm
         }
         else if (data.instr.class_type.opB == LD_ST_OPB_LDRB) {
 
@@ -387,12 +394,63 @@ int decode (const COND_Type data) {
 
 int decode (const UNCOND_Type data) {
    if (opts.instrs) { 
-      cout << "b 0x" << hex << data.instr.b.imm << endl;
+      cout << "b 0x" << hex << signExtend8to32ui(data.instr.b.imm*2) + rf[15] + 2 << endl;
    }
 }
 
 int decode (const LDM_Type data) {
-   cout << "LDM_TYPE" << endl;
+   bool multiple = FALSE;
+   cout << "ldm ";
+   cout << "r" << data.instr.ldm.rn;
+   cout << "!, {";
+   if (data.instr.ldm.reg_list & 1) {
+      cout << "r0";
+      multiple = TRUE;
+   }
+   if (data.instr.ldm.reg_list & 2) {
+      if (multiple)
+         cout << ", ";
+      cout << "r1";
+      multiple = TRUE;
+   }
+   if (data.instr.ldm.reg_list & 4) {
+      if (multiple)
+         cout << ", ";
+      cout << "r2";
+      multiple = TRUE;
+   }
+   if (data.instr.ldm.reg_list & 8) {
+      if (multiple)
+         cout << ", ";
+      cout << "r3";
+      multiple = TRUE;
+   }
+   if (data.instr.ldm.reg_list & 16) {
+      if (multiple)
+         cout << ", ";
+      cout << "r4";
+      multiple = TRUE;
+   }
+   if (data.instr.ldm.reg_list & 32) {
+      if (multiple)
+         cout << ", ";
+      cout << "r5";
+      multiple = TRUE;
+   }
+   if (data.instr.ldm.reg_list & 64) {
+      if (multiple)
+         cout << ", ";
+      cout << "r6";
+      multiple = TRUE;
+   }
+   if (data.instr.ldm.reg_list & 128) {
+      if (multiple)
+         cout << ", ";
+      cout << "r7";
+      multiple = TRUE;
+   }
+   cout << "}" << endl;
+   return LDM_TYPE;
 }
 
 int decode (const STM_Type data) {
