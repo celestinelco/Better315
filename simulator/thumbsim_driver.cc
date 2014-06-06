@@ -126,34 +126,34 @@ bool Cache::access(unsigned int address) {
 void Stats::print() {
   cout << dec
        << "Total number of dynamic instructions: " << instrs << endl
-       << "Total number of cycles: " << cycles << endl
-       << "  RType: " << numRType << endl
-       << "  IType: " << numIType << endl
-       << "  JType: " << numJType << endl
+//       << "Total number of cycles: " << cycles << endl
+//       << "  RType: " << numRType << endl
+//       << "  IType: " << numIType << endl
+//       << "  JType: " << numJType << endl
        << "Number of Memory Reads: " << numMemReads << endl
        << "Number of Memory Writes: " << numMemWrites << endl
        << "Number of Register Reads: " << numRegReads << endl
        << "Number of Register Writes: " << numRegWrites << endl
-       << "Number of Forwards: " << endl
-       << "  From Ex Stage: " << numForwardsEx << endl
-       << "  From Mem Stage: " << numForwardsMem << endl
+//       << "Number of Forwards: " << endl
+//       << "  From Ex Stage: " << numForwardsEx << endl
+//       << "  From Mem Stage: " << numForwardsMem << endl
        << "Branches: " << endl
        << "  Forward:" << endl
        << "    Taken: " << numForwardBranchesTaken << endl
        << "    Not taken: " << numForwardBranchesNotTaken << endl
        << "  Backward:" << endl
        << "    Taken: " << numBackwardBranchesTaken << endl
-       << "    Not taken: " << numBackwardBranchesNotTaken << endl
-       << "Branch delay slot: " << endl
-       << "  Useful instruction: " << hasUsefulBranchDelaySlot << endl
-       << "  Not useful instruction: " << hasUselessBranchDelaySlot << endl
-       << "Jump delay slot: " << endl
-       << "  Useful instruction: " << hasUsefulJumpDelaySlot << endl
-       << "  Not useful instruction: " << hasUselessJumpDelaySlot << endl
-       << "Load Use Hazard: " << endl
-       << "  Has load use stall: " << loadHasLoadUseStall << endl
-       << "  Has load use hazard: " << loadHasLoadUseHazard << endl
-       << "  Has no load use hazard: " << loadHasNoLoadUseHazard << endl;
+       << "    Not taken: " << numBackwardBranchesNotTaken << endl;
+//       << "Branch delay slot: " << endl
+//       << "  Useful instruction: " << hasUsefulBranchDelaySlot << endl
+//       << "  Not useful instruction: " << hasUselessBranchDelaySlot << endl
+//       << "Jump delay slot: " << endl
+//       << "  Useful instruction: " << hasUsefulJumpDelaySlot << endl
+//       << "  Not useful instruction: " << hasUselessJumpDelaySlot << endl
+//       << "Load Use Hazard: " << endl
+//       << "  Has load use stall: " << loadHasLoadUseStall << endl
+//       << "  Has load use hazard: " << loadHasLoadUseHazard << endl
+//       << "  Has no load use hazard: " << loadHasNoLoadUseHazard << endl;
 }
 
 unsigned int swizzle(unsigned int d) {
