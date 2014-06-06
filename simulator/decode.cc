@@ -360,7 +360,7 @@ int decode (const COND_Type data) {
    if (opts.instrs) { 
       cout << "b";
       printCond(data.instr.b.cond);
-      cout << " 0x" << hex << data.instr.b.imm + rf[15] << endl;
+      cout << " 0x" << hex << data.instr.b.imm*4 + rf[15] << endl;
    }
 }
 
