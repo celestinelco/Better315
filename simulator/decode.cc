@@ -195,6 +195,7 @@ SP_Ops decode (const SP_Type data) {
 }
 LD_ST_Ops decode (const LD_ST_Type data) {
    if (data.instr.class_type.opA == LD_ST_REG_OPA) {
+      cout << "TODO: " << __LINE__ << endl;
       if (data.instr.class_type.opB == LD_ST_OPB_LDRB) {
 
       }
