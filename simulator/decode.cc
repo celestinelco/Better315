@@ -200,7 +200,8 @@ LD_ST_Ops decode (const LD_ST_Type data) {
             cout << data.instr.ld_st_reg.rn << ", r" << data.instr.ld_st_reg.rm << "]" << endl;
         }
         else if (data.instr.class_type.opB == LD_ST_OPB_LDRB) {
-
+            cout << "strb r" << data.instr.ld_st_reg.rt << ", [r";
+            cout << data.instr.ld_st_reg.rn << ", r" << data.instr.ld_st_reg.rm << "]" << endl;
         }
     }
    else if (data.instr.class_type.opA == LD_ST_IMM_OPA) {
