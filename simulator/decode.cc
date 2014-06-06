@@ -152,7 +152,7 @@ SP_Ops decode (const SP_Type data) {
    }
    else {
       if (opts.instrs) { 
-         cout << "nop" << endl;
+         cout << "TODO" << data.instr.mov.op << endl;
       }
    }
 
