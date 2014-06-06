@@ -78,19 +78,19 @@ Thumb_Types decode (const ALL_Types data) {
 ALU_Ops decode (const ALU_Type data) {
    if (data.instr.lsli.op == ALU_LSLI_OP) {
        if (opts.instrs) { 
-         cout << "lsls r" << data.instr.lsli.rd  << ", r" << data.instr.lsli.rm << ", # " << data.instr.lsli.imm << endl;
+         cout << "lsls r" << data.instr.lsli.rd  << ", r" << data.instr.lsli.rm << ", #" << data.instr.lsli.imm << endl;
       }
       return ALU_LSLI;
    }
    else if (data.instr.lsri.op == ALU_LSRI_OP) {
        if (opts.instrs) { 
-         cout << "lsrs r" << data.instr.lsri.rd  << ", r" << data.instr.lsri.rm << ", # " << data.instr.lsri.imm << endl;
+         cout << "lsrs r" << data.instr.lsri.rd  << ", r" << data.instr.lsri.rm << ", #" << data.instr.lsri.imm << endl;
       }
       return ALU_LSRI;
    }
    else if (data.instr.asri.op == ALU_ASRI_OP) {
        if (opts.instrs) { 
-         cout << "asri r" << data.instr.asri.rd  << ", r" << data.instr.asri.rm << ", # " << data.instr.asri.imm << endl;
+         cout << "asri r" << data.instr.asri.rd  << ", r" << data.instr.asri.rm << ", #" << data.instr.asri.imm << endl;
       }
       return ALU_ASRI;
    }
@@ -132,7 +132,7 @@ ALU_Ops decode (const ALU_Type data) {
    }
    else if (data.instr.cmp.op == ALU_CMP_OP) { 
       if (opts.instrs) { 
-         cout << "cmp r" << data.instr.cmp.rdn << ", #" << data.instr.cmp.imm << endl;
+         cout << "cmp r" << data.instr.cmp.rdn << ", #" << dec << data.instr.cmp.imm << endl;
       }
       return ALU_CMP;
    }
@@ -182,7 +182,7 @@ SP_Ops decode (const SP_Type data) {
             cout << " sp, sp, r" << data.instr.mov.rm << endl;
          }
          else {
-            cout << " r" << data.instr.mov.rd << ", r" << data.instr.mov.rm << endl;
+            cout << " r" << data.instr.mov.rd << ", r" << data.instr.mov.rd << ", r" << data.instr.mov.rm << endl;
          }
       }
    }
@@ -393,7 +393,7 @@ int decode (const COND_Type data) {
 
 int decode (const UNCOND_Type data) {
    if (opts.instrs) { 
-      cout << "b 0x" << hex << data.instr.b.imm << endl;
+      cout << "b 0x" << hex << signExtend8to32ui(data.instr.b.imm*2) + rf[15] + 2 << endl;
    }
 }
 
