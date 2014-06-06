@@ -92,7 +92,10 @@ ALU_Ops decode (const ALU_Type data) {
       return ALU_ADDR;
    }
    else if (data.instr.subr.op == ALU_SUBR_OP) {
-
+      if (opts.instrs) { 
+         cout << "subs r" << data.instr.subr.rd  << ", r" << data.instr.subr.rn << ", r" << data.instr.subr.rm << endl;
+      }
+      return ALU_ADDR;
    }
    else if (data.instr.add3i.op == ALU_ADD3I_OP) {
       if (opts.instrs) { 
@@ -101,6 +104,10 @@ ALU_Ops decode (const ALU_Type data) {
       return ALU_ADD3I;
    }
    else if (data.instr.sub3i.op == ALU_SUB3I_OP) {
+      if (opts.instrs) { 
+         cout << "subs r" << data.instr.sub3i.rd << ", r" << data.instr.sub3i.rn << ", #" << data.instr.sub3i.imm << endl;
+      }
+      return ALU_SUB3I;
    }
    else if (data.instr.add8i.op == ALU_ADD8I_OP) {
       if (opts.instrs) { 
@@ -109,7 +116,10 @@ ALU_Ops decode (const ALU_Type data) {
       return ALU_ADD8I;
    }
    else if (data.instr.sub8i.op == ALU_SUB8I_OP) {
-
+       if (opts.instrs) {
+           cout << "subs r" << data.instr.sub8i.rdn << ", #" << data.instr.sub8i.imm << endl;
+       }
+       return ALU_SUB8I;
    }
    else if (data.instr.cmp.op == ALU_CMP_OP) { 
       if (opts.instrs) { 
@@ -119,7 +129,7 @@ ALU_Ops decode (const ALU_Type data) {
    }
    else if (data.instr.mov.op == ALU_MOV_OP) { 
       if (opts.instrs) { 
-         cout << "movs r" << data.instr.mov.rdn << ", #" << (data.instr.mov.imm) << endl;
+         cout << "movs r" << data.instr.mov.rdn << ", #" << dec << (data.instr.mov.imm) << endl;
       }
       return ALU_MOV;
    }
