@@ -152,7 +152,12 @@ SP_Ops decode (const SP_Type data) {
 }
 LD_ST_Ops decode (const LD_ST_Type data) {
    if (data.instr.class_type.opA == LD_ST_REG_OPA) {
+      if (data.instr.class_type.opB == LD_ST_OPB_LDRB) {
 
+      }
+      else if () {
+
+      }
    }
    else if (data.instr.class_type.opA == LD_ST_IMM_OPA) {
       if (data.instr.class_type.opB == LD_ST_OPB_STR) {
@@ -169,6 +174,20 @@ LD_ST_Ops decode (const LD_ST_Type data) {
       }
    }
    else if (data.instr.class_type.opA == LD_ST_IMMB_OPA) {
+      if (data.instr.class_type.opB > LD_ST_OPB_LDRSB) {
+         // LOAD byte
+         cout << "ldrb r" << data.instr.ld_st_imm.rt << ", [r" << data.instr.ld_st_imm.rn;
+         cout << ", #" data.instr.ld_st_imm.imm*4 << "]";
+         cout << "TODO: The execute of this.  Hasn't shown up yet lolol";
+         return LDRBI;
+      }
+      else {
+         // STORE byte
+         cout << "strb r" << data.instr.ld_st_imm.rt << ", [r" << data.instr.ld_st_imm.rn;
+         cout << ", #" data.instr.ld_st_imm.imm*4 << "]";
+         cout << "TODO: The execute of this.  Hasn't shown up yet lolol";
+         return STRBI;
+      }
    }
    else if (data.instr.class_type.opA == LD_ST_IMMH_OPA) {
    }
