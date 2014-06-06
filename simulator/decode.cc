@@ -152,17 +152,34 @@ SP_Ops decode (const SP_Type data) {
       if (opts.instrs) { 
          cout << "mov";
          if (data.instr.mov.d) {
-            cout << " sp, r" << data.instr.mov.rm << endl;
+            if(data.instr.mov.rd + data.instr.mov.d * 8 == 13) 
+               cout << " sp, r" << data.instr.mov.rm << endl;
+            else
+               cout << " r" << data.instr.mov.rd + data.instr.mov.d * 8 << ", r" << dec << data.instr.mov.rm << endl;
+         }
+         else {
+            if(data.instr.mov.rm == 13) 
+               cout << " r" << data.instr.mov.rd << ", sp" << endl;
+            else
+               cout << " r" << data.instr.mov.rd << ", r" << dec << data.instr.mov.rm << endl;
+         }
+      }
+      return SP_MOV;
+   }
+   else if(data.instr.add.op == 0) {
+      if(opts.instrs) {
+         cout << "add";
+         if (data.instr.mov.d) {
+            cout << " sp, sp, r" << data.instr.mov.rm << endl;
          }
          else {
             cout << " r" << data.instr.mov.rd << ", r" << data.instr.mov.rm << endl;
          }
       }
-      return SP_MOV;
    }
    else {
       if (opts.instrs) { 
-         cout << "nop" << endl;
+         cout << "TODO" << data.instr.mov.op << endl;
       }
    }
 
@@ -355,11 +372,13 @@ MISC_Ops decode (const MISC_Type data) {
 
 }
 
+unsigned int signExtend8to32ui(char i);
+
 int decode (const COND_Type data) {
    if (opts.instrs) { 
       cout << "b";
       printCond(data.instr.b.cond);
-      cout << " 0x" << hex << data.instr.b.imm*4 + rf[15] << endl;
+      cout << " 0x" << hex << signExtend8to32ui(data.instr.b.imm*2) + rf[15] + 2 << endl;
    }
 }
 
@@ -375,7 +394,7 @@ int decode (const LDM_Type data) {
 
 int decode (const STM_Type data) {
    bool multiple = FALSE;
-   cout << "stmia ";
+   cout << "stm ";
    cout << "r" << data.instr.stm.rn;
    cout << "!, {";
    if (data.instr.stm.reg_list & 1) {
@@ -438,7 +457,7 @@ int decode (const LDRL_Type data) {
 
 int decode (const ADD_SP_Type data) {
    if (opts.instrs) { 
-      cout << "add r" << data.instr.add.rd << ", sp, #" << data.instr.add.imm << endl;
+      cout << "add r" << data.instr.add.rd << ", sp, #" << data.instr.add.imm*4 << endl;
    }
 }
 
