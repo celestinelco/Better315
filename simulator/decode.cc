@@ -143,6 +143,8 @@ ALU_Ops decode (const ALU_Type data) {
       return ALU_MOV;
    }
 
+    cout << "TODO: oh crap " << __LINE__ << endl;
+    return ALU_MOV;
 }
 
 DP_Ops decode (const DP_Type data) {
@@ -249,7 +251,11 @@ LD_ST_Ops decode (const LD_ST_Type data) {
    }
    else if (data.instr.class_type.opA == LD_ST_IMMSP_OPA) {
    }
+
+    cout << "TODO: ah crap." << dec << __LINE__ << endl;
+    return STRBI;
 }
+
 MISC_Ops decode (const MISC_Type data) {
    if (data.instr.push.op == MISC_PUSH_OP) {
       if (opts.instrs) { 
@@ -392,6 +398,8 @@ MISC_Ops decode (const MISC_Type data) {
       return MISC_ADD;
    }
 
+   cout << "TODO: CRAP" << dec << __LINE__ << endl;
+   return MISC_ADD;
 }
 
 unsigned int signExtend8to32ui(char i);

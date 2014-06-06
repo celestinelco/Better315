@@ -103,10 +103,8 @@ void execute() {
   Thumb_Types itype;
   unsigned int pctarget = PC + 2;
   unsigned int addr;
-  int diff, BitCount, bit;
-  int x, y, result, sSum;
-  unsigned int uSum;
-  char byte;
+  int BitCount;
+  int result;
   int offset;
 
   /* Convert instruction to correct type */
@@ -254,14 +252,29 @@ void execute() {
         case LDRBR:
           addr = rf[ld_st.instr.ld_st_reg.rm] + rf[ld_st.instr.ld_st_reg.rn];
           caches.access(addr);
-          stats.numRegReads ++;
-          stats.numMemReads ++;
+          stats.numRegReads += 2;
 
-          rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr] & 0xff);
+          rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr].data_ubyte4(0));
+          stats.numMemReads ++;
           stats.numRegWrites ++;
           break;
         case STRBR:
-          cout << "STRBR" << endl;
+          addr = rf[ld_st.instr.ld_st_reg.rm] + rf[ld_st.instr.ld_st_reg.rn];
+          caches.access(addr);
+          stats.numRegReads += 2;
+
+          dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt] & 0xff);
+          stats.numMemWrites ++;
+          stats.numRegReads ++;
+          break;
+        case STRR:
+          addr = rf[ld_st.instr.ld_st_reg.rn] + rf[ld_st.instr.ld_st_reg.rm];
+          caches.access(addr);
+          stats.numRegReads ++;
+          stats.numMemWrites ++;
+
+          dmem.write(addr, rf[ld_st.instr.ld_st_imm.rt]);
+          stats.numRegReads ++;
           break;
         default:
           cout << "TODO: " << ldst_ops << endl;
