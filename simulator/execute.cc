@@ -106,6 +106,7 @@ void execute() {
   int diff, BitCount, bit;
   int x, y, result, sSum;
   unsigned int uSum;
+  char byte;
   int offset;
 
   /* Convert instruction to correct type */
@@ -249,6 +250,18 @@ void execute() {
 
           rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr]);
           stats.numRegWrites ++;
+          break;
+        case LDRBR:
+          addr = rf[ld_st.instr.ld_st_reg.rm] + rf[ld_st.instr.ld_st_reg.rn];
+          caches.access(addr);
+          stats.numRegReads ++;
+          stats.numMemReads ++;
+
+          rf.write(ld_st.instr.ld_st_imm.rt, dmem[addr] & 0xff);
+          stats.numRegWrites ++;
+          break;
+        case STRBR:
+          cout << "STRBR" << endl;
           break;
         default:
           cout << "TODO: " << ldst_ops << endl;
