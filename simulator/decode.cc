@@ -162,7 +162,7 @@ LD_ST_Ops decode (const LD_ST_Type data) {
       if (data.instr.class_type.opB == LD_ST_OPB_LDRB) {
 
       }
-      else if () {
+      else if (true) {
 
       }
    }
@@ -184,14 +184,14 @@ LD_ST_Ops decode (const LD_ST_Type data) {
       if (data.instr.class_type.opB > LD_ST_OPB_LDRSB) {
          // LOAD byte
          cout << "ldrb r" << data.instr.ld_st_imm.rt << ", [r" << data.instr.ld_st_imm.rn;
-         cout << ", #" data.instr.ld_st_imm.imm*4 << "]";
+         cout << ", #" << data.instr.ld_st_imm.imm*4 << "]";
          cout << "TODO: The execute of this.  Hasn't shown up yet lolol";
          return LDRBI;
       }
       else {
          // STORE byte
          cout << "strb r" << data.instr.ld_st_imm.rt << ", [r" << data.instr.ld_st_imm.rn;
-         cout << ", #" data.instr.ld_st_imm.imm*4 << "]";
+         cout << ", #" << data.instr.ld_st_imm.imm*4 << "]";
          cout << "TODO: The execute of this.  Hasn't shown up yet lolol";
          return STRBI;
       }
