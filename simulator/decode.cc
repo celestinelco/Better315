@@ -185,14 +185,17 @@ SP_Ops decode (const SP_Type data) {
 
 }
 LD_ST_Ops decode (const LD_ST_Type data) {
-   if (data.instr.class_type.opA == LD_ST_REG_OPA) {
-      if (data.instr.class_type.opB == LD_ST_OPB_LDRB) {
+    if (data.instr.class_type.opA == LD_ST_REG_OPA) {
+        if (data.instr.class_type.opB == LD_ST_OPB_LDRB) {
+            cout << "ldrb r" << data.instr.ld_st_reg.rt << ", [r";
+            cout << data.instr.ld_st_reg.rn << ", r" << data.instr.ld_st_reg.rm << "]" << endl;
 
-      }
-      else if (true) {
+                //rt, rn, rm
+        }
+        else if (data.instr.class_type.opB == LD_ST_OPB_LDRB) {
 
-      }
-   }
+        }
+    }
    else if (data.instr.class_type.opA == LD_ST_IMM_OPA) {
       if (data.instr.class_type.opB == LD_ST_OPB_STR) {
          if (opts.instrs) { 
