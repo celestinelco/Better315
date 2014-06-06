@@ -150,6 +150,17 @@ SP_Ops decode (const SP_Type data) {
       }
       return SP_MOV;
    }
+   else if(data.instr.add.op == 0) {
+      if(opts.instrs) {
+         cout << "add";
+         if (data.instr.mov.d) {
+            cout << " sp, sp, r" << data.instr.mov.rm << endl;
+         }
+         else {
+            cout << " r" << data.instr.mov.rd << ", r" << data.instr.mov.rm << endl;
+         }
+      }
+   }
    else {
       if (opts.instrs) { 
          cout << "TODO" << data.instr.mov.op << endl;
@@ -428,7 +439,7 @@ int decode (const LDRL_Type data) {
 
 int decode (const ADD_SP_Type data) {
    if (opts.instrs) { 
-      cout << "add r" << data.instr.add.rd << ", sp, #" << data.instr.add.imm << endl;
+      cout << "add r" << data.instr.add.rd << ", sp, #" << data.instr.add.imm*4 << endl;
    }
 }
 
